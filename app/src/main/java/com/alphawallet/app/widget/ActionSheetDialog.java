@@ -36,7 +36,6 @@ import com.alphawallet.app.repository.entity.Realm1559Gas;
 import com.alphawallet.app.repository.entity.RealmTransaction;
 import com.alphawallet.app.service.TokensService;
 import com.alphawallet.app.ui.HomeActivity;
-import com.alphawallet.app.ui.TransactionSuccessActivity;
 import com.alphawallet.app.ui.widget.entity.ActionSheetCallback;
 import com.alphawallet.app.ui.widget.entity.GasWidgetInterface;
 import com.alphawallet.app.util.Utils;
@@ -156,7 +155,8 @@ public class ActionSheetDialog extends ActionSheet implements StandardFunctionIn
 
         if (!tx.gasLimit.equals(BigInteger.ZERO))
         {
-            setGasEstimate(new GasEstimate(tx.gasLimit));
+            gasWidgetInterface.setGasEstimateExact(tx.gasLimit);
+            functionBar.setPrimaryButtonEnabled(true);
         }
 
         updateAmount();
@@ -627,11 +627,8 @@ public class ActionSheetDialog extends ActionSheet implements StandardFunctionIn
         switch (mode)
         {
             case SEND_TRANSACTION:
-                //Display transaction success dialog
-                Intent intent = new Intent(getContext(), TransactionSuccessActivity.class);
-                intent.putExtra(C.EXTRA_TXHASH, txHash);
-                intent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-                activity.startActivityForResult(intent, C.COMPLETED_TRANSACTION);
+                //Send user to activity sheet, bypass the transaction confirmation screen
+                actionSheetCallback.dismissed(txHash, callbackId, true);
                 tryDismiss();
                 break;
 

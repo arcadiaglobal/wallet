@@ -67,7 +67,6 @@ AlphaWallet's focus is to provide an interface to interact with Ethereum Tokens 
 
 To learn more about us, please check our Blog or join the conversation:
 - [Blog](https://medium.com/alphawallet)
-- [Telegram](https://t.me/AlphaWalletGroup)
 - [Twitter](https://twitter.com/AlphaWallet)
 - [Facebook](https://www.facebook.com/AlphaWallet)
 - [LinkedIn](https://www.linkedin.com/company/alphawallet/)

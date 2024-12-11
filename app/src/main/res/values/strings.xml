@@ -776,7 +776,7 @@
     <string name="disconnect">Disconnect</string>
     <string name="keep_connect">Keep Connected</string>
     <string name="beware_of_scammers">Beware of scammers!\nDon\'t share seed phrase.</string>
-    <string name="alphawallet_never_ask">AlphaWallet will NEVER ask about your seed phrase (especially on Telegram).</string>
+    <string name="alphawallet_never_ask">AlphaWallet will NEVER ask about your seed phrase (and we only reply to DMs, never DM first).</string>
     <string name="your_seed_phrase">Your seed phrase (do not share with anyone)</string>
     <string name="hide_seed_text">OK, Hide Seed Phrase</string>
     <string name="ens_not_match_wallet">ENS Name does not match wallet address</string>
@@ -992,8 +992,8 @@
     <string name="key_diagnostic">Key Diagnostic</string>
     <string name="key_found">Key found</string>
     <string name="key_not_found">Unable to find Key</string>
-    <string name="seed_phrase_public_key">Seed Phrase detected public key: %1$s</string>
-    <string name="keystore_public_key">Decoded Keystore public key: %1$s</string>
+    <string name="seed_phrase_public_key">Seed Phrase detected public key</string>
+    <string name="keystore_public_key">Decoded Keystore public key</string>
     <string name="enclave_locked">Locked</string>
     <string name="key_type_in_database">Key type in Database</string>
     <string name="key_entry_in_secure_enclave">Key Entry in Secure Enclave</string>
@@ -1080,5 +1080,8 @@
 
     <string name="constructor">Constructor</string>
     <string name="use_tokenscript_viewer">Use TokenScript Viewer</string>
-
+    <string name="not_recommended_to_visit">This URL is not whitelisted. It is still possible to visit by changing protection options in the settings, but it is not recommended. You could be about to lose your funds, especially if it\'s an investment in crypto-mining. There are plenty of regulated crypto investment sites.</string>
+    <string name="developer_override_warning">Warning: You are about to switch off standard protection. This prevents you from getting scammed. Only use the developer mode if you are testing your dapp, or if you are 100\% sure that the site is safe. Remember: if someone is telling you to switch this setting on, you are almost certainly about to lose your crypto funds.</string>
+    <string name="warning">Warning</string>
+    <string name="i_accept">I accept the risk</string>
 </resources>

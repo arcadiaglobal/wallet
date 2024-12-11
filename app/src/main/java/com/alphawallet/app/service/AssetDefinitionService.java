@@ -5,8 +5,6 @@ import static com.alphawallet.app.repository.TokensRealmSource.IMAGES_DB;
 import static com.alphawallet.ethereum.EthereumNetworkBase.MAINNET_ID;
 import static com.alphawallet.token.tools.TokenDefinition.TOKENSCRIPT_ADDRESS;
 import static com.alphawallet.token.tools.TokenDefinition.TOKENSCRIPT_CHAIN;
-import static com.alphawallet.token.tools.TokenDefinition.TOKENSCRIPT_CURRENT_SCHEMA;
-import static com.alphawallet.token.tools.TokenDefinition.TOKENSCRIPT_REPO_SERVER;
 import static com.alphawallet.token.tools.TokenDefinition.TOKENSCRIPT_STORE_SERVER;
 import static com.alphawallet.token.tools.TokenDefinition.UNCHANGED_SCRIPT;
 
@@ -77,7 +75,6 @@ import org.web3j.abi.DefaultFunctionEncoder;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
-import org.web3j.crypto.Keys;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.EthBlock;
@@ -2290,7 +2287,7 @@ public class AssetDefinitionService implements ParseResult, AttributeInterface
                                                                   ContractType type, UpdateType update)
     {
         return Single.fromCallable(() -> {
-            ActionModifier requiredActionModifier = type == ContractType.ATTESTATION ? ActionModifier.ATTESTATION : ActionModifier.NONE;
+            List<ActionModifier> modifiers = getAllowedTypes(type);
             Map<BigInteger, List<String>> validActions = new HashMap<>();
             TokenDefinition td = getAssetDefinition(token);
             if (td != null)
@@ -2309,7 +2306,7 @@ public class AssetDefinitionService implements ParseResult, AttributeInterface
                     for (String actionName : actions.keySet())
                     {
                         TSAction action = actions.get(actionName);
-                        if (action == null || action.modifier != requiredActionModifier)
+                        if (action == null || !modifiers.contains(action.modifier))
                         {
                             continue; //do not include attestations if this isn't an attestation fetch
                         }
@@ -2343,6 +2340,23 @@ public class AssetDefinitionService implements ParseResult, AttributeInterface
 
             return validActions;
         });
+    }
+
+    private List<ActionModifier> getAllowedTypes(ContractType type)
+    {
+        List<ActionModifier> modifiers = new ArrayList<>();
+        switch (type)
+        {
+            case ATTESTATION -> {
+                modifiers.add(ActionModifier.ATTESTATION);
+            }
+            default -> {
+                modifiers.add(ActionModifier.NONE);
+                modifiers.add(ActionModifier.ACTIVITY);
+            }
+        }
+
+        return modifiers;
     }
 
     private void addIntrinsicAttributes(Map<String, TokenScriptResult.Attribute> attrs, Token token, BigInteger tokenId)

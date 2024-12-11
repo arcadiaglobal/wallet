@@ -44,9 +44,9 @@ public class CustomViewSettings
     //If blank, enable the user filter select dialog, if there are any entries here, the select network dialog is disabled
     //Note: you should always enable the chainId corresponding to the chainIDs in the lockedTokens.
     private static final List<Long> lockedChains = Arrays.asList(
-            EthereumNetworkBase.MAINNET_ID,
-            EthereumNetworkBase.GNOSIS_ID,
-            EthereumNetworkBase.SEPOLIA_TESTNET_ID
+            //EthereumNetworkBase.MAINNET_ID,
+            //EthereumNetworkBase.GNOSIS_ID,
+            //EthereumNetworkBase.SEPOLIA_TESTNET_ID
     );
 
     public static final List<Long> alwaysVisibleChains = Arrays.asList(

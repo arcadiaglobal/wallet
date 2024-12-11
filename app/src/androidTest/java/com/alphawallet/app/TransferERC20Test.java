@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 
 import android.os.Build;
 
+import static androidx.test.espresso.Espresso.pressBack;
 import com.alphawallet.app.resources.Contracts;
 import com.alphawallet.app.util.EthUtils;
 import com.alphawallet.app.util.Helper;
@@ -30,7 +31,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AATransferERC20Test extends BaseE2ETest
+public class TransferERC20Test extends BaseE2ETest
 {
     private String contractAddress;
     private final String contractOwnerPk = "0x69c22d654be7fe75e31fbe26cb56c93ec91144fab67cb71529c8081971635069";
@@ -105,6 +106,8 @@ public class AATransferERC20Test extends BaseE2ETest
         addCustomToken(contractAddress);
         sendBalanceTo("AW test token", "1.11", newWalletAddress);
         ensureTransactionConfirmed();
+        //for ERC20 send need to now click back to go back home
+        pressBack();
         switchToWallet(newWalletAddress);
         addCustomToken(contractAddress);
         assertBalanceIs("1.11");

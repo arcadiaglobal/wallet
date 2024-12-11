@@ -7,16 +7,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-
+    <!-- Note: this permission is used to display the active WalletConnect Notification. This is a courtesy to the user to inform them a WalletConnect channel is active -->
+    <!-- This is pegged to class WalletConnectV2Service which has no data connection, the data connection is only active when the AlphaWallet app is open -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
-
 
     <uses-feature
             android:name="android.hardware.fingerprint"
@@ -41,6 +39,22 @@
             android:usesCleartextTraffic="true"
             tools:replace="android:name, android:theme, android:allowBackup">
 
+
+        <receiver android:name=".entity.HomeReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="C.REQUEST_NOTIFICATION_ACCESS" />
+                <action android:name="C.BACKUP_WALLET_SUCCESS" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".entity.FinishReceiver"
+                android:exported="false">
+            <intent-filter>
+                <action android:name="C.PRUNE_ACTIVITY" />
+            </intent-filter>
+        </receiver>
+
         <activity
                 android:name=".ui.HomeActivity"
                 android:exported="true"
@@ -52,21 +66,31 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="wc" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="aw.app" />
+                <data android:host="www.aw.app" />
+                <data android:pathPrefix="/" />
             </intent-filter>
             <intent-filter>
+                <data android:scheme="wc" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
+            </intent-filter>
+            <intent-filter>
                 <data android:scheme="awallet" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.VIEW" />
@@ -87,24 +111,6 @@
                 <data android:pathPattern="/.*\\.xml" />
                 <data android:pathPattern="/.*\\..*\\.xml" />
                 <data android:pathPattern="/.*\\..*\\..*\\.xml" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="http" />
-                <data android:host="wallet.arcadia.global" />
-            </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="https" />
-                <data android:host="wallet.arcadia.global" />
             </intent-filter>
         </activity>
 
@@ -233,12 +239,14 @@
         <activity
                 android:name=".ui.TokenFunctionActivity"
                 android:hardwareAccelerated="true"
-                android:label="@string/token_function" />
+                android:label="@string/token_function"
+                android:windowSoftInputMode="adjustResize"/>
 
         <activity
                 android:name=".ui.FunctionActivity"
                 android:hardwareAccelerated="true"
-                android:label="@string/token_function" />
+                android:label="@string/token_function"
+                android:windowSoftInputMode="adjustResize"/>
 
         <activity
                 android:name=".ui.WalletActionsActivity"
@@ -304,10 +312,6 @@
         <activity
                 android:name=".ui.WalletConnectSessionActivity"
                 android:label="WalletConnect Sessions" />
-
-        <activity
-                android:name=".ui.TransactionSuccessActivity"
-                android:label="Transaction Success" />
 
         <activity
                 android:name=".ui.SetPriceAlertActivity"

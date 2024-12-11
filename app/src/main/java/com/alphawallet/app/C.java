@@ -40,8 +40,8 @@ public abstract class C {
     public static final String ARBITRUM_ONE_NETWORK = "Arbitrum One";
     public static final String PALM_NAME = "PALM";
     public static final String PALM_TEST_NAME = "PALM (Test)";
-    public static final String KLAYTN_NAME = "Klaytn Cypress";
-    public static final String KLAYTN_BAOBAB_NAME = "Klaytn Baobab (Test)";
+    public static final String KLAYTN_NAME = "Kaia Mainnet";
+    public static final String KLAYTN_BAOBAB_NAME = "Kaia Kairos (Test)";
     public static final String IOTEX_NAME = "IoTeX";
     public static final String IOTEX_TESTNET_NAME = "IoTeX (Test)";
     public static final String AURORA_MAINNET_NAME = "Aurora";
@@ -58,6 +58,14 @@ public abstract class C {
     public static final String LINEA_TESTNET_NAME = LINEA_NAME + " (Test)";
     public static final String HOLESKY_TESTNET_NAME = "Holesky (Test)";
 
+    public static final String AMOY_TESTNET_NAME = "Amoy (Test)";
+    public static final String BASE_MAINNET_NAME = "Base";
+    public static final String BASE_TESTNET_NAME = "Base Sepolia (Test)";
+    public static final String MANTLE_MAINNET_NAME = "Mantle";
+    public static final String MANTLE_TESTNET_NAME = "Mantle Sepolia (Test)";
+    public static final String MINT_MAINNET_NAME = "Mint";
+    public static final String MINT_TESTNET_NAME = "Mint Sepolia (Test)";
+
     public static final String ETHEREUM_TICKER_NAME = "ethereum";
     public static final String CLASSIC_TICKER_NAME = "ethereum-classic";
     public static final String XDAI_TICKER_NAME = "dai";
@@ -67,6 +75,8 @@ public abstract class C {
 
     public static final String USD_SYMBOL = "$";
     public static final String ETH_SYMBOL = "ETH";
+
+    public static final String MANTLE_SYMBOL = "MNT";
     public static final String xDAI_SYMBOL = "xDai";
     public static final String ETC_SYMBOL = "ETC";
     public static final String GOERLI_SYMBOL = "GÖETH";
@@ -79,7 +89,7 @@ public abstract class C {
     public static final String CRONOS_TEST_SYMBOL = "tCRO";
     public static final String ARBITRUM_SYMBOL = "AETH";
     public static final String PALM_SYMBOL = "PALM";
-    public static final String KLAYTN_SYMBOL = "KLAY";
+    public static final String KLAYTN_SYMBOL = "KAIA";
     public static final String IOTEX_SYMBOL = "IOTX";
     public static final String MILKOMEDA_SYMBOL = "milkADA";
     public static final String MILKOMEDA_TEST_SYMBOL = "milktADA";
@@ -90,6 +100,8 @@ public abstract class C {
     public static final String ROOTSTOCK_SYMBOL = "RBTC";
     public static final String ROOTSTOCK_TEST_SYMBOL = "tBTC";
     public static final String HOLESKY_TEST_SYMBOL = "Hol" + ETH_SYMBOL;
+
+    public static final String AMOY_TESTNET_SYMBOL = "Am" + ETH_SYMBOL;
 
     public static final String BURN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -234,7 +246,6 @@ public abstract class C {
 
     public static final String DEFAULT_NETWORK = ETHEREUM_NETWORK_NAME;
 
-    public static final String TELEGRAM_PACKAGE_NAME = "org.telegram.messenger";
     public static final String TWITTER_PACKAGE_NAME = "com.twitter.android";
     public static final String FACEBOOK_PACKAGE_NAME = "com.facebook.katana";
     public static final String LINKEDIN_PACKAGE_NAME = "com.linkedin.android";

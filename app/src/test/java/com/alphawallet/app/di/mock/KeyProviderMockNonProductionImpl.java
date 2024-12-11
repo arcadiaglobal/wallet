@@ -117,6 +117,12 @@ public class KeyProviderMockNonProductionImpl implements KeyProvider
     }
 
     @Override
+    public String getOkLBKey()
+    {
+        return null;
+    }
+
+    @Override
     public String getBlockPiBaobabKey()
     {
         return null;
@@ -142,6 +148,18 @@ public class KeyProviderMockNonProductionImpl implements KeyProvider
 
     @Override
     public String getSmartPassDevKey()
+    {
+        return null;
+    }
+
+    @Override
+    public String getCoinGeckoKey()
+    {
+        return null;
+    }
+
+    @Override
+    public String getBackupKey()
     {
         return null;
     }

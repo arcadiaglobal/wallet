@@ -42,6 +42,7 @@ import com.alphawallet.token.entity.ProviderTypedData;
 import com.alphawallet.token.entity.Signable;
 import com.google.gson.Gson;
 import com.google.zxing.client.android.Intents;
+import com.google.zxing.common.StringUtils;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import org.jetbrains.annotations.NotNull;
@@ -619,13 +620,41 @@ public class Utils
         }
     }
 
-    public static String splitAddress(String address)
+    public static String splitAddress(String address, int lines)
     {
         address = Keys.toChecksumAddress(address);
-        int split = address.length()/2;
-        String front = address.substring(0, split);
-        String back = address.substring(split);
-        return front + " " + back;
+        return splitHex(address, lines);
+    }
+
+    public static String splitHex(String hex, int lines)
+    {
+        int split = hex.length()/lines;
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        int addend = 0;
+        for (int i = 0; i < (lines-1); i++)
+        {
+            addend = 0;
+            if (index > 0)
+            {
+                sb.append(" ");
+            }
+            else
+            {
+                if (lines%2 != 0)
+                {
+                    addend = 1;
+                }
+            }
+            sb.append(hex.substring(0, split + addend));
+            index += split;
+            hex = hex.substring(split + addend);
+        }
+        sb.append(" ");
+        sb.append(hex);
+        //String front = hex.substring(0, split);
+        //String back = hex.substring(split);
+        return sb.toString();
     }
 
     public static String formatTxHash(String txHash)
@@ -944,7 +973,7 @@ public class Utils
     private static final String IPFS_PREFIX = "ipfs://";
     private static final String IPFS_DESIGNATOR = "/ipfs/";
     public static final String IPFS_INFURA_RESOLVER = "https://alphawallet.infura-ipfs.io";
-    public static final String IPFS_IO_RESOLVER = "https://ipfs.io";
+    public static final String IPFS_MATCHER = "^Qm[1-9A-Za-z]{44}(\\/.*)?$";
 
     public static boolean isIPFS(String url)
     {
@@ -977,9 +1006,10 @@ public class Utils
         return parsed;
     }
 
-    private static boolean shouldBeIPFS(String url)
+    public static boolean shouldBeIPFS(String url)
     {
-        return url.startsWith("Qm") && url.length() == 46 && !url.contains(".") && !url.contains("/");
+        Matcher regexResult = Pattern.compile(IPFS_MATCHER).matcher(url);
+        return regexResult.find();
     }
 
     public static String loadFile(Context context, @RawRes int rawRes)
@@ -1519,5 +1549,10 @@ public class Utils
         {
             return metaDataURI;
         }
+    }
+
+    public static boolean isDivisibleString(String originalText)
+    {
+        return !TextUtils.isEmpty(originalText) && originalText.length() <= 64;
     }
 }

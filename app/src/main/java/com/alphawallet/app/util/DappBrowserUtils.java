@@ -1,6 +1,7 @@
 package com.alphawallet.app.util;
 
 import static com.alphawallet.app.util.Utils.isValidUrl;
+import static com.alphawallet.ethereum.EthereumNetworkBase.POLYGON_AMOY_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.POLYGON_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.POLYGON_TEST_ID;
 
@@ -12,6 +13,7 @@ import androidx.preference.PreferenceManager;
 
 import com.alphawallet.app.C;
 import com.alphawallet.app.entity.DApp;
+import com.google.android.gms.common.util.HttpUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -252,6 +254,23 @@ public class DappBrowserUtils
         return dapps;
     }
 
+    public static boolean isInDappsList(Context context, String candidateURL)
+    {
+        List<DApp> knownDapps = getDappsList(context);
+        //strip the URL to get only the domain
+        String candidateDomain = Utils.getDomainName(candidateURL);
+        
+        for (DApp dapp : knownDapps)
+        {
+            String thisDomain = Utils.getDomainName(dapp.getUrl());
+            if (candidateDomain.equals(thisDomain))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void saveHistory(Context context, List<DApp> history)
     {
         if (context != null)
@@ -291,7 +310,7 @@ public class DappBrowserUtils
 
     public static String defaultDapp(long chainId)
     {
-        return (chainId == POLYGON_ID || chainId == POLYGON_TEST_ID) ? POLYGON_HOMEPAGE : DEFAULT_HOMEPAGE;
+        return (chainId == POLYGON_ID || chainId == POLYGON_TEST_ID || chainId == POLYGON_AMOY_ID) ? POLYGON_HOMEPAGE : DEFAULT_HOMEPAGE;
     }
 
     public static boolean isWithinHomePage(String url)

@@ -5,10 +5,16 @@ import static com.alphawallet.hardware.SignatureReturnType.SIGNATURE_GENERATED;
 import static com.walletconnect.web3.wallet.client.Wallet.Model;
 import static com.walletconnect.web3.wallet.client.Wallet.Params;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,8 +23,13 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.MutableLiveData;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.alphawallet.app.App;
 import com.alphawallet.app.C;
@@ -33,7 +44,7 @@ import com.alphawallet.app.repository.KeyProvider;
 import com.alphawallet.app.repository.KeyProviderFactory;
 import com.alphawallet.app.repository.PreferenceRepositoryType;
 import com.alphawallet.app.service.GasService;
-import com.alphawallet.app.service.WalletConnectV2Service;
+import com.alphawallet.app.ui.WalletConnectNotificationActivity;
 import com.alphawallet.app.ui.WalletConnectSessionActivity;
 import com.alphawallet.app.ui.WalletConnectV2Activity;
 import com.alphawallet.app.ui.widget.entity.ActionSheetCallback;
@@ -54,6 +65,8 @@ import com.walletconnect.web3.wallet.client.Wallet;
 import com.walletconnect.web3.wallet.client.Wallet.Model.Session;
 import com.walletconnect.web3.wallet.client.Web3Wallet;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.web3j.utils.Numeric;
 
 import java.util.ArrayList;
@@ -67,6 +80,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 import timber.log.Timber;
 
 public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
@@ -85,6 +99,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
     private boolean hasConnection;
     private Application application;
     private final PreferenceRepositoryType preferenceRepository;
+    private final int WC_NOTIFICATION_ID = 25964950;
 
     public AWWalletConnectClient(Context context, WalletConnectInteract walletConnectInteract, PreferenceRepositoryType preferenceRepository, GasService gasService)
     {
@@ -128,7 +143,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
 
         try
         {
-            listOfSettledSessions = Web3Wallet.INSTANCE.getListOfActiveSessions();
+            listOfSettledSessions = Web3Wallet.getListOfActiveSessions();
         }
         catch (IllegalStateException e)
         {
@@ -208,7 +223,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
 
     private List<String> getSupportedMethods()
     {
-        return Arrays.asList("eth_sendTransaction", "eth_signTransaction", "eth_signTypedData", "eth_signTypedData_v3", "eth_signTypedData_v4", "personal_sign", "eth_sign");
+        return Arrays.asList("eth_sendTransaction", "eth_signTransaction", "eth_signTypedData", "eth_signTypedData_v3", "eth_signTypedData_v4", "personal_sign", "eth_sign", "wallet_switchEthereumChain");
     }
 
     private List<String> getSupportedEvents()
@@ -269,24 +284,76 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
     {
         try
         {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            if (items.isEmpty())
             {
-                if (items.isEmpty())
-                {
-                    context.stopService(new Intent(context, WalletConnectV2Service.class));
-                    //now signal
-                }
-                else
-                {
-                    Intent serviceIntent = new Intent(context, WalletConnectV2Service.class);
-                    ContextCompat.startForegroundService(context, serviceIntent);
-                }
+                removeNotification();
+            }
+            else
+            {
+                displayNotification();
             }
         }
         catch (Exception e)
         {
             //Unable to update
             Timber.e(e);
+        }
+    }
+
+    public void displayNotification()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            createNotificationChannel();
+        }
+        Notification notification = createNotification();
+
+        // Issue the notification if we have user permission
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
+        {
+            notificationManager.notify(WC_NOTIFICATION_ID, notification);
+        }
+        else
+        {
+            Intent intent = new Intent(C.REQUEST_NOTIFICATION_ACCESS);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        }
+    }
+
+    final String CHANNEL_ID = "WalletConnectV2Service";
+    private Notification createNotification()
+    {
+        Intent notificationIntent = new Intent(context, WalletConnectNotificationActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, WC_NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        return new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.notify_wallet_connect_title))
+                .setContentText(context.getString(R.string.notify_wallet_connect_content))
+                .setSmallIcon(R.drawable.ic_logo)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createNotificationChannel()
+    {
+        CharSequence name = context.getString(R.string.notify_wallet_connect_title);
+        String description = context.getString(R.string.notify_wallet_connect_content);
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription(description);
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+    }
+
+    //remove notification
+    private void removeNotification()
+    {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
+        {
+            notificationManager.cancel(WC_NOTIFICATION_ID);
         }
     }
 
@@ -353,7 +420,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
         Core.Model.AppMetaData appMetaData = getAppMetaData(application);
         String relayServer = String.format("%s/?projectId=%s", C.WALLET_CONNECT_REACT_APP_RELAY_URL, keyProvider.getWalletConnectProjectId());
         CoreClient coreClient = CoreClient.INSTANCE;
-        coreClient.initialize(appMetaData, relayServer, ConnectionType.AUTOMATIC, application, null, null, new NetworkClientTimeout(30, TimeUnit.SECONDS), error -> {
+        coreClient.initialize(appMetaData, relayServer, ConnectionType.AUTOMATIC, application, null, null, new NetworkClientTimeout(30, TimeUnit.SECONDS), false, error -> {// .initialize(appMetaData, relayServer, ConnectionType.AUTOMATIC, application, null, null, new NetworkClientTimeout(30, TimeUnit.SECONDS), error -> {
             Timber.w(error.throwable);
             return null;
         });
@@ -379,6 +446,19 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
         }
     }
 
+    /*
+            data class AppMetaData(
+            val name: String,
+            val description: String,
+            val url: String,
+            val icons: List<String>,
+            val redirect: String?,
+            val appLink: String? = null,
+            val linkMode: Boolean = false,
+            val verifyUrl: String? = null
+        ) : Model()
+     */
+
     @NonNull
     public Core.Model.AppMetaData getAppMetaData(Application application)
     {
@@ -387,7 +467,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
         String[] icons = {C.ALPHA_WALLET_LOGO_URL};
         String description = "The ultimate Web3 Wallet to power your tokens.";
         String redirect = "kotlin-responder-wc:/request";
-        return new Core.Model.AppMetaData(name, description, url, Arrays.asList(icons), redirect, null);
+        return new Core.Model.AppMetaData(name, description, url, Arrays.asList(icons), redirect, null, false, null);// .AppMetaData(name, description, url, Arrays.asList(icons), redirect, null);
     }
 
     public void shutdown()
@@ -509,6 +589,7 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
                 }
                 else
                 {
+                    // TODO: Update the libs
                     Web3Wallet.INSTANCE.respondAuthRequest(new Params.AuthRequestResponse.Error(requestId, 0, "User rejected request."), (authRequestResponse) -> {
                         closeWalletConnectActivity();
                         return null;
@@ -613,6 +694,26 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
     {
         String checkMethod;
         String method = sessionRequest.getRequest().getMethod();
+        if (method.equals("wallet_switchEthereumChain"))
+        {
+            //does AW support this chain? If so then proceed.
+            JSONObject response = new JSONObject();
+            try
+            {
+                response.put("jsonrpc", "2.0");
+                response.put("id", sessionRequest.request.id);
+                response.put("result", "null");
+            }
+            catch (JSONException e)
+            {
+                //
+            }
+
+            //how to respond affirmative?
+            approve(sessionRequest, response.toString());
+            return;
+        }
+
         if (method.startsWith("eth_signTypedData"))
         {
             checkMethod = "eth_signTypedData";
@@ -658,6 +759,31 @@ public class AWWalletConnectClient implements Web3Wallet.WalletDelegate
         }
 
         return intent;
+    }
+
+    @Nullable
+    @Override
+    public Function2<Model.SessionAuthenticate, Model.VerifyContext, Unit> getOnSessionAuthenticate()
+    {
+        return null;
+    }
+
+    @Override
+    public void onProposalExpired(@NonNull Model.ExpiredProposal expiredProposal)
+    {
+        // TODO: Remove popup if still showing
+    }
+
+    @Override
+    public void onRequestExpired(@NonNull Model.ExpiredRequest expiredRequest)
+    {
+        // TODO: remove popup if still showing
+    }
+
+    @Override
+    public void onSessionExtend(@NonNull Session session)
+    {
+        //Session extension. Do we use a timeout here?
     }
 
     public interface WalletConnectV2Callback

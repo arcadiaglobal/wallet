@@ -53,6 +53,7 @@
 	<color name="shark">#232325</color>
 	<color name="atlantis">#7cca42</color>
 	<color name="yellow">#FDD835</color>
+    <color name="base_logo">#0052FF</color>
     <!-- AG Colors -->
     <color name="ag_red">#FF0000</color>
     <color name="ag_orange">#FF4400</color>

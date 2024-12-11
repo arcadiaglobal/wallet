@@ -100,12 +100,6 @@ public class AdvancedSettingsActivity extends BaseActivity
                 .withListener(this::onClearBrowserCacheClicked)
                 .build();
 
-        tokenScript = new SettingsItemView.Builder(this)
-                .withIcon(R.drawable.ic_settings_tokenscript)
-                .withTitle(R.string.title_tokenscript)
-                .withListener(this::onTokenScriptClicked)
-                .build();
-
         //TODO Change Icon
         tokenScriptManagement = new SettingsItemView.Builder(this)
                 .withIcon(R.drawable.ic_settings_tokenscript_manage)
@@ -165,9 +159,46 @@ public class AdvancedSettingsActivity extends BaseActivity
         tokenScriptViewer.setToggleState(viewModel.getTokenScriptViewerState());
     }
 
+    @FunctionalInterface
+    public interface Callback 
+    {
+        void onResult(boolean choice);
+    }
+
     private void onDeveloperOverride()
     {
-        viewModel.toggleDeveloperOverride(developerOverride.getToggleState());
+        boolean developerOverrideState = developerOverride.getToggleState();
+        if (developerOverrideState)
+        {
+            //display warning popup
+            showWarningPopup(R.string.developer_override_warning, result -> {
+                viewModel.toggleDeveloperOverride(result);
+                developerOverride.setToggleState(result);
+            });
+        }
+        else
+        {
+            viewModel.toggleDeveloperOverride(developerOverride.getToggleState());
+        }
+    }
+
+    private void showWarningPopup(int message, Callback callback)
+    {
+        AWalletAlertDialog dialog = new AWalletAlertDialog(this);
+        dialog.setIcon(AWalletAlertDialog.WARNING);
+        dialog.setTitle(R.string.warning);
+        dialog.setMessage(message);
+        dialog.setButtonText(R.string.i_accept);
+        dialog.setButtonListener(v -> {
+            callback.onResult(true);
+            dialog.dismiss();
+        });
+        dialog.setSecondaryButtonText(R.string.action_cancel);
+        dialog.setSecondaryButtonListener(v -> {
+            callback.onResult(false);
+            dialog.dismiss();
+        });
+        dialog.show();
     }
 
     private void onFullScreenClicked()
@@ -191,10 +222,6 @@ public class AdvancedSettingsActivity extends BaseActivity
         advancedSettingsLayout.addView(nodeStatus);
         advancedSettingsLayout.addView(console);
         advancedSettingsLayout.addView(clearBrowserCache);
-
-        if (!checkWritePermission() && EthereumNetworkRepository.extraChains() == null)
-            advancedSettingsLayout.addView(tokenScript);
-
         advancedSettingsLayout.addView(tokenScriptManagement);
         advancedSettingsLayout.addView(fullScreenSettings);
         advancedSettingsLayout.addView(refreshTokenDatabase);
@@ -300,11 +327,6 @@ public class AdvancedSettingsActivity extends BaseActivity
         }
     }
 
-    private void onTokenScriptClicked()
-    {
-        showXMLOverrideDialog();
-    }
-
     private void onTokenScriptManagementClicked()
     {
         Intent intent = new Intent(this, TokenScriptManagementActivity.class);
@@ -321,40 +343,6 @@ public class AdvancedSettingsActivity extends BaseActivity
     {
         Intent intent = new Intent(this, AnalyticsSettingsActivity.class);
         startActivity(intent);
-    }
-
-    private void showXMLOverrideDialog()
-    {
-        AWalletConfirmationDialog cDialog = new AWalletConfirmationDialog(this);
-        cDialog.setTitle(R.string.enable_xml_override_dir);
-        cDialog.setSmallText(R.string.explain_xml_override);
-        cDialog.setMediumText(R.string.ask_user_about_xml_override);
-        cDialog.setPrimaryButtonText(R.string.dialog_ok);
-        cDialog.setPrimaryButtonListener(v ->
-        {
-            //ask for OS permission and write directory
-            askWritePermission();
-            cDialog.dismiss();
-        });
-        cDialog.setSecondaryButtonText(R.string.dialog_cancel_back);
-        cDialog.setSecondaryButtonListener(v ->
-        {
-            cDialog.dismiss();
-        });
-        cDialog.show();
-    }
-
-    private void askWritePermission()
-    {
-        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        Timber.w("Folder write permission is not granted. Requesting permission");
-        ActivityCompat.requestPermissions(this, permissions, HomeActivity.RC_ASSET_EXTERNAL_WRITE_PERM);
-    }
-
-    private boolean checkWritePermission()
-    {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override

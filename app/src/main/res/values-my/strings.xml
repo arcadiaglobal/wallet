@@ -393,7 +393,6 @@
     <string name="is_address">Ethereum လိပ်စာကိုဖတ်ပြီးပါပြီ။ တိုကင်အဖြစ်ထည့်သွင်းရန်ကြိုးစားကြည့်ပါမည်လား။</string>
     <string name="dialog_load_as_contract">တိုကင်ကိုဖော်ပြမည်</string>
     <string name="blockchain">%1$s Blockchain</string>
-    <string name="telegram">Telegram</string>
     <string name="transfer_request">အပြောင်းအရွှေ့တောင်းဆိုမှု</string>
     <string name="token_transfer_request">တိုကင်အပြောင်းအရွှေ့တောင်းဆိုမှု: %1$s</string>
     <string name="generate_payment_request">ငွေပေးချေရန်တောင်းဆိုမှုကိုပြုလုပ်မည်</string>
@@ -743,7 +742,7 @@
     <string name="disconnect">ချိတ်ဆက်မှုဖြုတ်သိမ်းမည်</string>
     <string name="keep_connect">ဆက်လက်ချိတ်ဆက်ထားမည်</string>
     <string name="beware_of_scammers">လိမ်လည်သူများကိုသတိပြုပါ။ Seed Phraseကို လုံးဝမမျှဝေပါနှင့်။</string>
-    <string name="alphawallet_never_ask">AlphaWalletသည်သင်၏Seed Phraseအားမည်သည့်အခါမှ(အထူးသဖြင့် Telegramတွင်) မေးမြန်းခြင်းမပြုပါ။.</string>
+    <string name="alphawallet_never_ask">AlphaWallet သည် သင်၏မျိုးစေ့စာစုအကြောင်း ဘယ်သောအခါမှ မေးမည်မဟုတ်ပါ (ကျွန်ုပ်တို့သည် DMs များကိုသာ စာပြန်သည်၊ DM ကို အရင်ဘယ်တော့မှ မမေးပါ)။</string>
     <string name="your_seed_phrase">သင်၏Seed Phrase(တခြားသူအားမဝေမျှမိရန်သတိပြုပါ)</string>
     <string name="hide_seed_text">Seed Phraseကိုဖုန်းကွယ်မည်။</string>
 
@@ -801,7 +800,7 @@
     <string name="safe_transfer">လုံခြုံစွာပြောင်းရွှေ့မည်</string>
     <string name="selected_tokens">ရွေးချယ်ထားသောတိုကင်များ</string>
     <string name="send_tokens">တိုကင်များကိုပို့မည်</string>
-    <string name="rate_prompt">အသုံးပြုသည်ကိုကျေနပ်မှုရှိလျှင် ကျေးဇူးပြု၍ ကျွန်တော်တို့အားအဆင့်သတ်မှတ်ပေး၍ကူညီပါ။</string>
+    <string name="rate_prompt">%1$s ကိုအသုံးပြုရတာကို နှစ်သက်တယ်ဆိုရင် အဆင့်သတ်မှတ်ခြင်းအားဖြင့် ကျေးဇူးပြု၍ ကူညီပေးပါ။</string>
     <string name="rate_later">နောက်မှ</string>
     <string name="rate_rate">အဆင့်သတ်မှတ်သည်</string>
     <string name="rate_no_thanks">မပြုလုပ်ပါ၊ ကျေးဇူးတင်ပါသည်။</string>
@@ -949,8 +948,8 @@
     <string name="key_diagnostic">Key Diagnostic</string>
     <string name="key_found">Key found</string>
     <string name="key_not_found">Unable to find Key</string>
-    <string name="seed_phrase_public_key">Seed Phrase detected public key: %1$s</string>
-    <string name="keystore_public_key">Decoded Keystore public key: %1$s</string>
+    <string name="seed_phrase_public_key">Seed Phrase detected public key</string>
+    <string name="keystore_public_key">Decoded Keystore public key</string>
     <string name="enclave_locked">Locked</string>
     <string name="key_type_in_database">Key type in Database</string>
     <string name="key_entry_in_secure_enclave">Key Entry in Secure Enclave</string>
@@ -1032,4 +1031,8 @@
     <string name="override_warning_text">သင့်ငွေများကို အချည်းနှီးဖြစ်စေနိုင်သည့် ငွေပေးငွေယူတစ်ခုအား သင်မသိလိုက်ဘဲ လက်မှတ်ထိုးပါတော့မည်။ သင်သည် ဆော့ဖ်ဝဲအင်ဂျင်နီယာတစ်ဦးအနေဖြင့် bytecode ကို လက်မှတ်ထိုးလိုနိုင်ပြီး၊ Advanced ဆက်တင်များတွင် developer မုဒ်ကို သင်သတ်မှတ်ပါက ဤသတိပေးချက်ကို အစားထိုးနိုင်ပါသည်။</string>
     <string name="constructor">Constructor</string>
     <string name="use_tokenscript_viewer">TokenScript ကြည့်ရှုသူ</string>
+    <string name="not_recommended_to_visit">ဤ URL ကို တရားဝင်စာရင်းမသွင်းပါ။ ဆက်တင်များတွင် အကာအကွယ်ရွေးချယ်မှုများ ပြောင်းလဲခြင်းဖြင့် ဝင်ကြည့်ရန် ဖြစ်နိုင်သေးသော်လည်း ၎င်းကို အကြံပြုထားခြင်း မရှိပါ။ အထူးသဖြင့် crypto-mining တွင် ရင်းနှီးမြုပ်နှံပါက သင့်ရန်ပုံငွေများ ဆုံးရှုံးတော့မည်ဖြစ်သည်။ ထိန်းညှိထားသော crypto ရင်းနှီးမြှုပ်နှံမှုဆိုက်များစွာရှိသည်။</string>
+    <string name="developer_override_warning">သတိပေးချက်- သင်သည် စံကာကွယ်ရေးကို ပိတ်ပါတော့မည်။ ၎င်းသည် သင့်အား အလိမ်ခံရခြင်းမှ ကာကွယ်ပေးသည်။ သင့် dapp ကို စမ်းသပ်နေပါက သို့မဟုတ် ဆိုက်သည် 100% စိတ်ချရကြောင်း 100\% သေချာပါက developer မုဒ်ကို အသုံးပြုပါ။ သတိရပါ- တစ်စုံတစ်ယောက်က ဤဆက်တင်ကိုဖွင့်ရန် သင့်အားပြောနေပါက၊ သင်သည် သင်၏ crypto ရန်ပုံငွေများကို ဆုံးရှုံးတော့မည်မှာ သေချာပါသည်။</string>
+    <string name="warning">သတိပေးချက်</string>
+    <string name="i_accept">အန္တရာယ်ကို ငါလက်ခံတယ်။</string>
 </resources>

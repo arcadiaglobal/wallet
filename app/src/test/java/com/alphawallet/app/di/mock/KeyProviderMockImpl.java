@@ -121,6 +121,12 @@ public class KeyProviderMockImpl implements KeyProvider
     }
 
     @Override
+    public String getOkLBKey()
+    {
+        return FAKE_KEY_FOR_TESTING;
+    }
+
+    @Override
     public String getBlockPiBaobabKey()
     {
         return FAKE_KEY_FOR_TESTING;
@@ -146,6 +152,18 @@ public class KeyProviderMockImpl implements KeyProvider
 
     @Override
     public String getSmartPassDevKey()
+    {
+        return FAKE_KEY_FOR_TESTING;
+    }
+
+    @Override
+    public String getCoinGeckoKey()
+    {
+        return FAKE_KEY_FOR_TESTING;
+    }
+
+    @Override
+    public String getBackupKey()
     {
         return FAKE_KEY_FOR_TESTING;
     }
