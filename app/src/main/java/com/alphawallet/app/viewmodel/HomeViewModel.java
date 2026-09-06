@@ -21,8 +21,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.alphawallet.app.BuildConfig;
 import com.alphawallet.app.C;
 import com.alphawallet.app.R;
-import com.alphawallet.app.analytics.Analytics;
-import com.alphawallet.app.entity.AnalyticsProperties;
 import com.alphawallet.app.entity.CryptoFunctions;
 import com.alphawallet.app.entity.EIP681Type;
 import com.alphawallet.app.entity.FragmentMessenger;
@@ -46,8 +44,6 @@ import com.alphawallet.app.repository.TokenRepository;
 import com.alphawallet.app.router.ExternalBrowserRouter;
 import com.alphawallet.app.router.ImportTokenRouter;
 import com.alphawallet.app.router.MyAddressRouter;
-import com.alphawallet.app.service.AlphaWalletNotificationService;
-import com.alphawallet.app.service.AnalyticsServiceType;
 import com.alphawallet.app.service.AssetDefinitionService;
 import com.alphawallet.app.service.GasService;
 import com.alphawallet.app.service.RealmManager;
@@ -94,7 +90,6 @@ import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import timber.log.Timber;
-import wallet.core.jni.Hash;
 
 @HiltViewModel
 public class HomeViewModel extends BaseViewModel
@@ -119,7 +114,6 @@ public class HomeViewModel extends BaseViewModel
     private final RealmManager realmManager;
     private final TokensService tokensService;
     private final GasService gasService;
-    private final AlphaWalletNotificationService alphaWalletNotificationService;
     private final MutableLiveData<String> walletName = new MutableLiveData<>();
     private final MutableLiveData<Wallet> defaultWallet = new MutableLiveData<>();
     private final MutableLiveData<Boolean> splashActivity = new MutableLiveData<>();
@@ -142,12 +136,10 @@ public class HomeViewModel extends BaseViewModel
             EthereumNetworkRepositoryType ethereumNetworkRepository,
             MyAddressRouter myAddressRouter,
             TransactionsService transactionsService,
-            AnalyticsServiceType analyticsService,
             ExternalBrowserRouter externalBrowserRouter,
             OkHttpClient httpClient,
             RealmManager realmManager,
             TokensService tokensService,
-            AlphaWalletNotificationService alphaWalletNotificationService,
             GasService gasService)
     {
         this.preferenceRepository = preferenceRepository;
@@ -163,8 +155,6 @@ public class HomeViewModel extends BaseViewModel
         this.externalBrowserRouter = externalBrowserRouter;
         this.httpClient = httpClient;
         this.realmManager = realmManager;
-        this.alphaWalletNotificationService = alphaWalletNotificationService;
-        setAnalyticsService(analyticsService);
         this.preferenceRepository.incrementLaunchCount();
         this.tokensService = tokensService;
         this.gasService = gasService;
@@ -366,7 +356,6 @@ public class HomeViewModel extends BaseViewModel
     {
         try
         {
-            AnalyticsProperties props = new AnalyticsProperties();
             QRParser parser = QRParser.getInstance(EthereumNetworkBase.extraChains());
             QRResult qrResult = parser.parse(qrCode);
             switch (qrResult.type)
@@ -376,30 +365,19 @@ public class HomeViewModel extends BaseViewModel
                     handleImportAttestation(activity, qrResult);
                     break;
                 case ADDRESS:
-                    props.put(QrScanResultType.KEY, QrScanResultType.ADDRESS.getValue());
-                    track(Analytics.Action.SCAN_QR_CODE_SUCCESS, props);
-
                     //showSend(activity, qrResult); //For now, direct an ETH address to send screen
                     //TODO: Issue #1504: bottom-screen popup to choose between: Add to Address book, Sent to Address, or Watch Wallet
                     showActionSheet(activity, qrResult);
                     break;
                 case PAYMENT:
                 case TRANSFER:
-                    props.put(QrScanResultType.KEY, QrScanResultType.ADDRESS_OR_EIP_681.getValue());
-                    track(Analytics.Action.SCAN_QR_CODE_SUCCESS, props);
-
                     showSend(activity, qrResult);
                     break;
                 case FUNCTION_CALL:
-                    props.put(QrScanResultType.KEY, QrScanResultType.ADDRESS_OR_EIP_681.getValue());
-                    track(Analytics.Action.SCAN_QR_CODE_SUCCESS, props);
-
                     //TODO: Handle via ConfirmationActivity, need to generate function signature + data then call ConfirmationActivity
                     //TODO: Code to generate the function signature will look like the code in generateTransactionFunction
                     break;
                 case URL:
-                    props.put(QrScanResultType.KEY, QrScanResultType.URL.getValue());
-                    track(Analytics.Action.SCAN_QR_CODE_SUCCESS, props);
                     activity.onBrowserWithURL(qrCode);
                     break;
                 case MAGIC_LINK:
@@ -532,24 +510,6 @@ public class HomeViewModel extends BaseViewModel
     public void showMyAddress(Activity activity)
     {
         myAddressRouter.open(activity, defaultWallet.getValue());
-    }
-
-    /**
-     * This method will uniquely identify the device by creating an ID and store in preference.
-     * This will be changed if user reinstall application or clear the storage explicitly.
-     **/
-    public void identify()
-    {
-        String uuid = preferenceRepository.getUniqueId();
-
-        if (uuid.isEmpty())
-        {
-            uuid = UUID.randomUUID().toString();
-        }
-
-        preferenceRepository.setUniqueId(uuid);
-
-        identify(uuid);
     }
 
     public void checkTransactionEngine()
@@ -700,7 +660,7 @@ public class HomeViewModel extends BaseViewModel
             byte[] preHash = td.getAttestationCollectionPreHash();
             if (preHash != null)
             {
-                newFileName = Numeric.toHexString(Hash.keccak256(preHash))
+                newFileName = Numeric.toHexString(org.web3j.crypto.Hash.sha3(preHash))
                         + "-" + info.addresses.keySet().iterator().next();
             }
             else
@@ -819,16 +779,6 @@ public class HomeViewModel extends BaseViewModel
             }
             return new ArrayList<>();
         };
-    }
-
-    public void subscribeToNotifications()
-    {
-        alphaWalletNotificationService.subscribe(com.alphawallet.ethereum.EthereumNetworkBase.MAINNET_ID);
-    }
-
-    public void unsubscribeToNotifications()
-    {
-        alphaWalletNotificationService.unsubscribeToTopic(com.alphawallet.ethereum.EthereumNetworkBase.MAINNET_ID);
     }
 
     public void setPostNotificationsPermissionRequested(String address)
