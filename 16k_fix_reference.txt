@@ -1,0 +1,32 @@
+# 16 KB Page Size Compatibility Fix (Reference)
+
+This fix was intended to resolve the "APK not compatible with 16 KB devices" error caused by misaligned native libraries (LOAD segments).
+
+## Changes in app/build.gradle:
+
+1.  **Updated packagingOptions**:
+    ```groovy
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging false // Enable 16 KB alignment
+        }
+    }
+    ```
+
+2.  **Upgraded SQLCipher**:
+    The legacy `net.zetetic:android-database-sqlcipher` is not 16 KB compatible. It needs to be replaced by `net.zetetic:sqlcipher-android`.
+    ```groovy
+    configurations.all {
+        exclude group: 'net.zetetic', module: 'android-database-sqlcipher'
+    }
+
+    dependencies {
+        implementation 'net.zetetic:sqlcipher-android:4.6.1'
+    }
+    ```
+
+3.  **Excluded legacy SQLCipher from transitive dependencies**:
+    Explicitly excluded from `com.walletconnect` dependencies to ensure the legacy version doesn't sneak back in.
+
+## Future Steps:
+To achieve full compatibility, the `com.walletconnect` SDK should be migrated to the `com.reown` SDK, which uses the modern SQLCipher package names and supports 16 KB alignment natively.

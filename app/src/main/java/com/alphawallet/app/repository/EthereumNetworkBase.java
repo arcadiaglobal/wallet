@@ -37,6 +37,8 @@ import static com.alphawallet.ethereum.EthereumNetworkBase.LINEA_TEST_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.MAINNET_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.MANTLE_MAINNET_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.MANTLE_TESTNET_ID;
+import static com.alphawallet.ethereum.EthereumNetworkBase.MINT_ID;
+import static com.alphawallet.ethereum.EthereumNetworkBase.MINT_SEPOLIA_TESTNET_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.OKX_ID;
 import static com.alphawallet.ethereum.EthereumNetworkBase.OPTIMISTIC_MAIN_FALLBACK_URL;
 import static com.alphawallet.ethereum.EthereumNetworkBase.OPTIMISTIC_MAIN_ID;
